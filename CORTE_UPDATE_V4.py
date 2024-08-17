@@ -1,6 +1,7 @@
 from notion_client import Client
 import requests
 import pyodbc
+import serial
 
 NOTION_TOKEN = "secret_QsHgUe4EMkRVgfDrd4CvhvFdwcImB0GnaUD8htBAYjw"
 SERVER = '192.168.193.204'
