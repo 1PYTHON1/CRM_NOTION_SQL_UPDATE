@@ -21,7 +21,7 @@ DATA_COMENTARIO = []
 DATA_CORTE = []
 DATA_TEMPLADO = []
 
-#-FUNCIONES-----------------------------------------------------------------------
+#-FUNCIONES NUEVAS----------------------------------------------------------------
 #Funcion para leer valores de ID de SQL server
 def leer_PT_V2(OP):
     filas_OP = 0

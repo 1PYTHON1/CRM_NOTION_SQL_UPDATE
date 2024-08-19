@@ -15,18 +15,32 @@ from qtmodern.windows import ModernWindow
 from qtawesome import icon
 from PyQt5.QtWidgets import QMessageBox
 import openpyxl
+from notion_client import Client
+import requests
 
 class DataEntryWidget(QWidget):
     def __init__(self):
         super().__init__()
         # Datos de Servidor SQL
-        SERVER = '192.168.193.204'
-        DATABASE = 'OPTemplados'
-        USERNAME = 'sa'
-        PASSWORD = 'admin9233'
+        self.NOTION_TOKEN = "secret_QsHgUe4EMkRVgfDrd4CvhvFdwcImB0GnaUD8htBAYjw"
+        self.SERVER = '192.168.193.204'
+        self.DATABASE = 'OPTemplados'
+        self.USERNAME = 'sa'
+        self.PASSWORD = 'admin9233'
+        self.ID_DB1 = "9742942ce3be45a7bfe38ddfb45a162f" # ID de la base de datos "LISTA DE PEDIDOS"
+        self.DATA_ITEM = []
+        self.DATA_BASE = []
+        self.DATA_ALTURA = []
+        self.DATA_ENTALLE= []
+        self.DATA_LAMINADO= []
+        self.DATA_PINTADO= []
+        self.DATA_INSULADO = []
+        self.DATA_COMENTARIO = []
+        self.DATA_CORTE = []
+        self.DATA_TEMPLADO = []
 
         # Deshabilitar la validación del certificado SSL temporalmente
-        connectionString = f'DRIVER={{ODBC Driver 18 for SQL Server}};SERVER={SERVER};DATABASE={DATABASE};UID={USERNAME};PWD={PASSWORD};TrustServerCertificate=yes;'
+        connectionString = f'DRIVER={{ODBC Driver 18 for SQL Server}};SERVER={self.SERVER};DATABASE={self.DATABASE};UID={self.USERNAME};PWD={self.PASSWORD};TrustServerCertificate=yes;'
 
         # Establecer la conexión con SQL Server
         try:
@@ -192,9 +206,10 @@ class DataEntryWidget(QWidget):
         self.altura_edit.returnPressed.connect(self.add_to_list)
         self.comentario_edit.returnPressed.connect(self.add_to_list)
         
-        self.export_excel_button = QPushButton(icon("mdi.microsoft-excel"),"Exportar a Excel")
-        self.export_excel_button.clicked.connect(self.export_to_excel)
-        self.layout.addWidget(self.export_excel_button, 14, 0, 1, 4)  # Ajusta las coordenadas según tu diseño
+        self.export_notion_button = QPushButton(icon("mdi.microsoft-excel"),"Guardar en NOTION")
+        #self.export_excel_button.clicked.connect(self.export_to_excel)
+        self.export_notion_button.clicked.connect(self.enviar_data_to_notion)
+        self.layout.addWidget(self.export_notion_button, 14, 0, 1, 4)  # Ajusta las coordenadas según tu diseño
 
         
         
@@ -396,7 +411,198 @@ class DataEntryWidget(QWidget):
                 QMessageBox.information(self, "Éxito", "Los datos se han exportado correctamente a Excel.")
         except Exception as e:
             QMessageBox.warning(self, "Error", f"Error al exportar a Excel: {e}")
+    def enviar_data_to_notion(self):
+        self.filas_OP = self.leer_PT_V2()
+        self.ID_DB2 = self.get_ID_DB2_F_OP()
+        print("ID_DB2:",self.ID_DB2)
+        self.ID_DB3 = self.create_DB3_vacia()
+        print("ID_DB3:", self.ID_DB3)
+        self.llenar_notion_DB3()
+        self.llenar_sql_Tabla_ID()
+    
 
+
+    #-FUNCIONES NUEVAS----------------------------------------------------------------
+    #Funcion para leer valores de ID de SQL server
+    def leer_PT_V2(self):
+        filas_OP = 0
+        OP = self.op_edit.text().strip()
+        try: 
+            connection_string = f'DRIVER={{SQL Server}};SERVER={self.SERVER};DATABASE={self.DATABASE};UID={self.USERNAME};PWD={self.PASSWORD}'
+            connection = pyodbc.connect(connection_string)
+        except:
+            print("F_COMUNICACION_SQL")
+        try:
+            DETECTOR_cursor = connection.cursor()
+            DETECTOR_cursor.execute("SELECT @@version;")
+            DETECTOR_query = 'SELECT * FROM PT_V2 where OP = '+ OP
+            DETECTOR_cursor.execute(DETECTOR_query)
+            DETECTOR_FILAS = DETECTOR_cursor.fetchall()
+            filas_OP = len(DETECTOR_FILAS)
+            if DETECTOR_FILAS != [] :
+                print("DATA SQL EXISTENTE PARA OP =",OP)
+                for i in range(filas_OP):
+                    self.DATA_ITEM.append(DETECTOR_FILAS[i][1])
+                    self.DATA_BASE.append(DETECTOR_FILAS[i][2])
+                    self.DATA_ALTURA.append(DETECTOR_FILAS[i][3])
+                    self.DATA_ENTALLE.append(DETECTOR_FILAS[i][4])
+                    self.DATA_LAMINADO.append(DETECTOR_FILAS[i][5])
+                    self.DATA_PINTADO.append(DETECTOR_FILAS[i][6])
+                    self.DATA_INSULADO.append(DETECTOR_FILAS[i][7])
+                    self.DATA_CORTE.append(DETECTOR_FILAS[i][8])
+                    self.DATA_TEMPLADO.append(DETECTOR_FILAS[i][9])
+            else:
+                print("DATA SQL NO EXISTENTE PARA OP =",OP)
+        except:
+            print("F_DETECTOR_CURSOR")
+        finally:
+            connection.close() # Cerrar la conexión
+            return filas_OP
+
+    #-NOTION ---------------------------------------------------------------------------------
+    # Función para obtener todas las páginas de la base de datos
+    def get_database_content(self):
+        ID = self.ID_DB1
+        notion = Client(auth=self.NOTION_TOKEN)
+        query_results = notion.databases.query(database_id=ID)
+        return query_results.get('results', [])
+
+    # Función para extraer la OP
+    def get_page_OP(self,page):
+        property_OP = page['properties']['OP']['unique_id']['number']
+        if property_OP is not None:
+            return property_OP
+        return 'Sin OP'
+
+    # Función para extraer la ID
+    def get_page_ID(self,page):
+        property_ID = page['id']
+        if property_ID is not None:
+            return property_ID
+        return 'Sin ID'
+
+    # Función para extraer la page ID filtrado por OP en especifico
+    def get_ID_DB2_F_OP(self):
+        OP = self.op_edit.text().strip()
+        content = self.get_database_content()
+        for i in range(len(content)):
+            block = content[i]
+            page_OP = self.get_page_OP(block)
+            if(page_OP == int(OP)):
+                page_ID = self.get_page_ID(block)
+                return page_ID
+        return "Sin ID"
+
+    #-NOTION CREAR NUEVA DATABASE VACIA---------------------------------------------------------------------------------
+    # Crear la nueva base de datos vacia
+    def create_DB3_vacia(self):
+        OP = self.op_edit.text().strip()
+        # Definir las estructura de DB3
+        database_properties = {
+            "1_ITEM": {
+                "title":{}
+            },
+            "2_BASE": {
+                "number":{}
+            },
+            "3_ALTURA": {
+                "number":{}
+            },
+            "4_ENTALLE": {
+                "type": "checkbox",
+                "checkbox": {}
+            },
+            "5_LAMINADO": {
+                "type": "checkbox",
+                "checkbox": {}
+            },
+            "6_PINTADO": {
+                "type": "checkbox",
+                "checkbox": {}
+            },
+            "7_INSULADO": {
+                "type": "checkbox",
+                "checkbox": {}
+            },
+            "8_CORTE": {
+                "type": "checkbox",
+                "checkbox": {}
+            },
+            "9_TEMPLADO": {
+                "type": "checkbox",
+                "checkbox": {}
+            }
+        }
+        new_database = {
+            "parent": {"type": "page_id", "page_id": self.ID_DB2},
+            "title": [{"type": "text","text": {"content": "Tabla OP "+ OP}}],
+            "properties": database_properties
+        }
+        try:
+            notion = Client(auth=self.NOTION_TOKEN)
+            response = notion.databases.create(**new_database)
+            ID_DB3 = response["id"]
+            return ID_DB3
+        except:
+            print("F_create_DB3")
+
+    #-NOTION LLENAR NUEVA DATABASE---------------------------------------------------------------------------------
+    # Función para llenar de datos a la nueva base de datos
+    def llenar_notion_DB3(self):
+        ID=self.ID_DB3
+        headers = {
+            "Authorization": "Bearer " + self.NOTION_TOKEN ,
+            "Content-Type": "application/json",
+            "Notion-Version": "2022-06-28",
+        }
+        create_url = "https://api.notion.com/v1/pages"
+        lista = list(range(self.filas_OP))
+        try:
+            for i in reversed(lista):
+                payload = {"parent": {"database_id": ID},
+                        "properties": {
+                                    "1_ITEM": {"title": [{"text": {"content": str(self.DATA_ITEM[i])}}]},
+                                    "2_BASE": {"number": self.DATA_BASE[i]},
+                                    "3_ALTURA": {"number": self.DATA_ALTURA[i]},
+                                    "4_ENTALLE":{"checkbox":self.False_o_True(self.DATA_ENTALLE[i])},
+                                    "5_LAMINADO":{"checkbox":self.False_o_True(self.DATA_LAMINADO[i])},
+                                    "6_PINTADO":{"checkbox":self.False_o_True(self.DATA_PINTADO[i])},
+                                    "7_INSULADO":{"checkbox":self.False_o_True(self.DATA_INSULADO[i])},
+                                    "8_CORTE":{"checkbox":self.False_o_True(self.DATA_CORTE[i])},
+                                    "9_TEMPLADO":{"checkbox":self.False_o_True(self.DATA_TEMPLADO[i])}
+                            }
+                        }
+                requests.post(create_url, headers=headers, json=payload)
+        except:
+            print("F_LLENAR_DB3")
+
+    def False_o_True(self,x):
+        if(x == "Sí"):
+            return False #True
+        elif(x == "No"):
+            return False
+        else:
+            return False
+
+    #-SQL LLENAR TABLA_ID---------------------------------------------------------------------------------
+    def llenar_sql_Tabla_ID(self):
+        OP = self.op_edit.text().strip()
+        try:
+            connection_string = f'DRIVER={{SQL Server}};SERVER={self.SERVER};DATABASE={self.DATABASE};UID={self.USERNAME};PWD={self.PASSWORD}'
+            connection = pyodbc.connect(connection_string)
+            DETECTOR_cursor = connection.cursor()
+            DETECTOR_cursor.execute('''
+                INSERT INTO Tabla_ID (OP, ID_DB1, ID_DB2, ID_DB3)
+                VALUES (?, ?, ?, ?)
+            ''', (int(OP), self.ID_DB1, self.ID_DB2, self.ID_DB3))
+            # Confirmar la transacción
+            connection.commit()
+        except:
+            print("F_TABLA_ID")
+        finally:
+            # Cerrar la conexión
+            connection.close()
+    #---------------------------------------------------------------------------------------------------------------------
 
 def set_application_style(app):
     # Establecer la hoja de estilo para la aplicación
