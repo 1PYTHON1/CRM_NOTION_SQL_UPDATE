@@ -22,7 +22,7 @@ class DataEntryWidget(QWidget):
     def __init__(self):
         super().__init__()
         # Datos de Servidor SQL
-        self.NOTION_TOKEN = "secret_QsHgUe4EMkRVgfDrd4CvhvFdwcImB0GnaUD8htBAYjw"
+        self.NOTION_TOKEN = "secret_DJgeLF4gqSFAci7vmdSje18Wjrh4iOKebK3WlUekpmv"
         self.SERVER = '192.168.193.204'
         self.DATABASE = 'OPTemplados'
         self.USERNAME = 'sa'
@@ -435,7 +435,7 @@ class DataEntryWidget(QWidget):
         try:
             DETECTOR_cursor = connection.cursor()
             DETECTOR_cursor.execute("SELECT @@version;")
-            DETECTOR_query = 'SELECT * FROM PT_V2 where OP = '+ OP
+            DETECTOR_query = 'SELECT * FROM PEDIDOS TEMPLADOS where OP = '+ OP
             DETECTOR_cursor.execute(DETECTOR_query)
             DETECTOR_FILAS = DETECTOR_cursor.fetchall()
             filas_OP = len(DETECTOR_FILAS)

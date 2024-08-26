@@ -14,11 +14,11 @@ USERNAME = 'sa'
 PASSWORD = 'admin9233'
 
 # Notion configuration
-NOTION_TOKEN = "secret_QsHgUe4EMkRVgfDrd4CvhvFdwcImB0GnaUD8htBAYjw"
+NOTION_TOKEN = "secret_DJgeLF4gqSFAci7vmdSje18Wjrh4iOKebK3WlUekpmv"
 new_state = True
 
 # Configuracion del Puerto Salida de Templados
-puerto_1 = 'COM2'
+puerto_1 = 'COM4'
 baudios = 9600
 
 # Deshabilitar la validación del certificado SSL temporalmente
