@@ -5,6 +5,7 @@ import datetime
 from notion_client import Client
 import requests
 import pyodbc
+import time
 
 # Datos de Servidor
 SERVER = '192.168.193.204'
@@ -17,16 +18,8 @@ NOTION_TOKEN = "secret_QsHgUe4EMkRVgfDrd4CvhvFdwcImB0GnaUD8htBAYjw"
 new_state = True
 
 # Configuracion del Puerto Salida de Templado
-puerto_2 = 'COM5'
+puerto_2 = 'COM2'
 baudios = 9600
-
-# Conexion de puerto Serial a puerto 1 templados 
-try:
-    conexion = serial.Serial(puerto_2, baudios, timeout=1)
-    print("Conexión establecida con", puerto_2 , "Mesa de Cortes")
-except serial.SerialException:
-    print("No se pudo establecer la conexión con", puerto_2)
-
     
 # Deshabilitar la validación del certificado SSL temporalmente
 connectionString = f'DRIVER={{ODBC Driver 18 for SQL Server}};SERVER={SERVER};DATABASE={DATABASE};UID={USERNAME};PWD={PASSWORD};TrustServerCertificate=yes;'
@@ -231,7 +224,15 @@ def get_page_ID_F_ITEM(page,ITEM):
 #-----------------------------------------------------------------------------------------------------------
 #-----------------------------------------------------------------------------------------------------------
 
-
+while True:
+    # Conexion de puerto Serial a puerto 1 templados 
+    try:
+        conexion = serial.Serial(puerto_2, baudios, timeout=1)
+        print("Conexión establecida con", puerto_2 , "Mesa de Cortes")
+        break
+    except serial.SerialException:
+        print("No se pudo establecer la conexión con", puerto_2)
+        time.sleep(15)
 while True: 
     try:
         # Leer una línea desde el puerto serial
