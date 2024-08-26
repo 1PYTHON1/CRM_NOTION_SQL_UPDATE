@@ -58,7 +58,7 @@ def write_db(informacion):
     print("Datos recibidos:", codebar)
     print("Inserting a new row into table")
     # Insert Query
-    tsql = "INSERT INTO OUT_T_V2 (OP,ITEM,FECHA) VALUES (?,?,?);"
+    tsql = "INSERT INTO x9_Templado_V2 (OP,ITEM,FECHA) VALUES (?,?,?);"
     with cursor.execute(tsql,OP,ITEM,timestamp()):
         print("Successfully Inserted!")
     return OP, ITEM
@@ -76,7 +76,7 @@ def filtro_double_Data(informacion):
     codesplit = informacion.split("-")
     itemsplit = codesplit[2].split("T")
     cursor = conn.cursor()
-    consulta = "SELECT COUNT(*) FROM OUT_T_V2 WHERE OP = ? AND  ITEM = ?"
+    consulta = "SELECT COUNT(*) FROM x9_Templado_V2 WHERE OP = ? AND  ITEM = ?"
     cursor.execute(consulta, codesplit[1], itemsplit[1])
     cantidad_filas = cursor.fetchone()[0]
     if cantidad_filas == 0:
@@ -148,7 +148,7 @@ def actualizar_datos_database(ID,ITEM):
         "Notion-Version": "2022-06-28",
     }
     url = f"https://api.notion.com/v1/pages/{ID_DB4}"
-    new_properties = {"properties": {"8_CORTE": {"checkbox": new_state}}}
+    new_properties = {"properties": {"9_TEMPLADO": {"checkbox": new_state}}}
     try:
         requests.patch(url, json=new_properties, headers=headers)
     except:
