@@ -16,7 +16,7 @@ PASSWORD = 'admin9233'
 NOTION_TOKEN = "secret_QsHgUe4EMkRVgfDrd4CvhvFdwcImB0GnaUD8htBAYjw"
 new_state = True
 
-# Configuracion del Puerto Salida de Templados
+# Configuracion del Puerto Salida de Templado
 puerto_2 = 'COM5'
 baudios = 9600
 

@@ -58,7 +58,7 @@ def write_db(informacion):
     print("Datos recibidos:", codebar)
     print("Inserting a new row into table")
     # Insert Query
-    tsql = "INSERT INTO x9_Templado_V2 (OP,ITEM,FECHA) VALUES (?,?,?);"
+    tsql = "INSERT INTO OUT_TEMPLADOS (OP,ITEM,FECHA) VALUES (?,?,?);"
     with cursor.execute(tsql,OP,ITEM,timestamp()):
         print("Successfully Inserted!")
     return OP, ITEM
@@ -76,7 +76,7 @@ def filtro_double_Data(informacion):
     codesplit = informacion.split("-")
     itemsplit = codesplit[2].split("T")
     cursor = conn.cursor()
-    consulta = "SELECT COUNT(*) FROM x9_Templado_V2 WHERE OP = ? AND  ITEM = ?"
+    consulta = "SELECT COUNT(*) FROM OUT_TEMPLADOS WHERE OP = ? AND  ITEM = ?"
     cursor.execute(consulta, codesplit[1], itemsplit[1])
     cantidad_filas = cursor.fetchone()[0]
     if cantidad_filas == 0:
