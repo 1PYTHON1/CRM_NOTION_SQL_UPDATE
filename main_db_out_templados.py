@@ -14,7 +14,7 @@ PASSWORD = 'admin9233'
 
 # Notion configuration
 NOTION_TOKEN = "secret_QsHgUe4EMkRVgfDrd4CvhvFdwcImB0GnaUD8htBAYjw"
-new_state = False
+new_state = True
 
 # Configuracion del Puerto Salida de Templados
 puerto_1 = 'COM2'
