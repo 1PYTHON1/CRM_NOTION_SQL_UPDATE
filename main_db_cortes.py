@@ -30,7 +30,6 @@ try:
 except Exception as e:
     print("Error al conectar a base de datos:", e)
     
-    
 def timestamp():
     # Obtener la marca de tiempo actual
     marca_de_tiempo_actual = datetime.datetime.now()

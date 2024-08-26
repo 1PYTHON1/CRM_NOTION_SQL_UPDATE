@@ -21,7 +21,6 @@ new_state = True
 puerto_1 = 'COM2'
 baudios = 9600
 
-   
 # Deshabilitar la validación del certificado SSL temporalmente
 connectionString = f'DRIVER={{ODBC Driver 18 for SQL Server}};SERVER={SERVER};DATABASE={DATABASE};UID={USERNAME};PWD={PASSWORD};TrustServerCertificate=yes;'
 # Conexion a la base de datos 
