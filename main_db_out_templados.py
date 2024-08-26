@@ -5,6 +5,7 @@ import datetime
 from notion_client import Client
 import requests
 import pyodbc
+import time
 
 # Datos de Servidor
 SERVER = '192.168.193.204'
@@ -20,14 +21,6 @@ new_state = True
 puerto_1 = 'COM2'
 baudios = 9600
 
-# Conexion de puerto Serial a puerto 1 templados 
-try:
-    conexion = serial.Serial(puerto_1, baudios, timeout=1)
-    print("Conexión establecida con", puerto_1 , "Salida de templados")
-except serial.SerialException:
-    print("No se pudo establecer la conexión con", puerto_1)
-
-    
 # Deshabilitar la validación del certificado SSL temporalmente
 connectionString = f'DRIVER={{ODBC Driver 18 for SQL Server}};SERVER={SERVER};DATABASE={DATABASE};UID={USERNAME};PWD={PASSWORD};TrustServerCertificate=yes;'
 # Conexion a la base de datos 
@@ -58,7 +51,7 @@ def write_db(informacion):
     print("Datos recibidos:", codebar)
     print("Inserting a new row into table")
     # Insert Query
-    tsql = "INSERT INTO OUT_T_V2 (OP,ITEM,FECHA) VALUES (?,?,?);"
+    tsql = "INSERT INTO OUT_TEMPLADOS (OP,ITEM,FECHA) VALUES (?,?,?);"
     with cursor.execute(tsql,OP,ITEM,timestamp()):
         print("Successfully Inserted!")
     return OP, ITEM
@@ -76,7 +69,7 @@ def filtro_double_Data(informacion):
     codesplit = informacion.split("-")
     itemsplit = codesplit[2].split("T")
     cursor = conn.cursor()
-    consulta = "SELECT COUNT(*) FROM OUT_T_V2 WHERE OP = ? AND  ITEM = ?"
+    consulta = "SELECT COUNT(*) FROM OUT_TEMPLADOS WHERE OP = ? AND  ITEM = ?"
     cursor.execute(consulta, codesplit[1], itemsplit[1])
     cantidad_filas = cursor.fetchone()[0]
     if cantidad_filas == 0:
@@ -148,7 +141,7 @@ def actualizar_datos_database(ID,ITEM):
         "Notion-Version": "2022-06-28",
     }
     url = f"https://api.notion.com/v1/pages/{ID_DB4}"
-    new_properties = {"properties": {"8_CORTE": {"checkbox": new_state}}}
+    new_properties = {"properties": {"9_TEMPLADO": {"checkbox": new_state}}}
     try:
         requests.patch(url, json=new_properties, headers=headers)
     except:
@@ -187,8 +180,17 @@ def get_page_ID_F_ITEM(page,ITEM):
 #-----------------------------------------------------------------------------------------------------------
 #-----------------------------------------------------------------------------------------------------------
 
+while True:
+    try:
+        conexion = serial.Serial(puerto_1, baudios, timeout=1)
+        print("Conexión establecida con", puerto_1 , "Salida de templados")
+        break
+    except serial.SerialException:
+        print("No se pudo establecer la conexión con", puerto_1)
+        time.sleep(15)
 
 while True:
+        # Conexion de puerto Serial a puerto 1 templados 
     try:
         # Leer una línea desde el puerto serial
         codebar = conexion.readline().decode('utf-8').strip()

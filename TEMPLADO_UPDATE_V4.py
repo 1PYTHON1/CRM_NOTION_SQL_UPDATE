@@ -17,7 +17,7 @@ NOTION_TOKEN = "secret_QsHgUe4EMkRVgfDrd4CvhvFdwcImB0GnaUD8htBAYjw"
 new_state = True
 
 # Configuracion del Puerto Salida de Templados
-puerto_1 = 'COM2'
+puerto_1 = 'COM5'
 baudios = 9600
 
 # Conexion de puerto Serial a puerto 1 templados 
