@@ -229,7 +229,7 @@ class DataEntryWidget(QWidget):
     
         try:
             # Verificar si la OP ya existe en la tabla CLIENTES
-            self.cursor.execute("SELECT COUNT(*) FROM CLIENTES WHERE OP = ?", (OP,))
+            self.cursor.execute("SELECT COUNT(*) FROM CLIENTES_TEMPLADOS WHERE OP = ?", (OP,))
             op_count = self.cursor.fetchone()[0]
     
             if op_count > 0:
@@ -237,7 +237,7 @@ class DataEntryWidget(QWidget):
                 return
     
             # Insertar el nuevo cliente si la OP no existe
-            self.cursor.execute("INSERT INTO CLIENTES VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'agregado')", (OP, cliente, vidrio, espesor, fecha, fecha_entrega, total, enjabado))
+            self.cursor.execute("INSERT INTO CLIENTES_TEMPLADOS VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'agregado')", (OP, cliente, vidrio, espesor, fecha, fecha_entrega, total, enjabado))
             self.conn.commit()
             QMessageBox.information(self, 'Éxito', 'Datos del cliente agregados correctamente.')
         except Exception as e:
