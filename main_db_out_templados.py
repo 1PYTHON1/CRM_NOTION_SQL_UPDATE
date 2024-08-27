@@ -136,10 +136,32 @@ def actualizar_datos_database(ID,ITEM):
 
 #-NOTION ---------------------------------------------------------------------------------
 # Función para obtener todas las páginas de la base de datos
-def get_database_content(ID):
+def get_database_content_antiguo(ID):
     notion = Client(auth=NOTION_TOKEN)
     query_results = notion.databases.query(database_id = ID)
     return query_results.get('results', [])
+
+def get_database_content(ID):
+    notion = Client(auth=NOTION_TOKEN)
+    all_results = []
+    has_more = True
+    start_cursor = None
+
+    while has_more:
+        # Realiza la solicitud a la API de Notion
+        query_response = notion.databases.query(
+            database_id=ID,
+            start_cursor=start_cursor
+        )
+
+        # Añade los resultados actuales a la lista total
+        all_results.extend(query_response.get('results', []))
+
+        # Verifica si hay más resultados y actualiza el cursor de inicio
+        has_more = query_response.get('has_more', False)
+        start_cursor = query_response.get('next_cursor')
+
+    return all_results
 
 # Función para extraer la OP
 def get_page_ITEM(page):
