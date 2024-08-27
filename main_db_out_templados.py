@@ -28,8 +28,7 @@ try:
     conn = pyodbc.connect(connectionString)
     print("Conexión exitosa a base de datos")
 except Exception as e:
-    print("Error al conectar a base de datos:", e)
-    
+    print("Error al conectar a base de datos:", e)    
     
 def timestamp():
     # Obtener la marca de tiempo actual
@@ -82,13 +81,8 @@ def filtro_double_Data(informacion):
 #FUNCIONES ----------------------------------------------------------------------------------------------
 #-SQL READ DATA---------------------------------------------------------------------------------
 def leer_Tabla_ID(OP):
-    try: 
-        connection_string = f'DRIVER={{SQL Server}};SERVER={SERVER};DATABASE={DATABASE};UID={USERNAME};PWD={PASSWORD}'
-        connection = pyodbc.connect(connection_string)
-    except:
-        print("F_COMUNICACION_SQL")
     try:
-        DETECTOR_cursor = connection.cursor()
+        DETECTOR_cursor = conn.cursor()
         DETECTOR_cursor.execute("SELECT @@version;")
         DETECTOR_query = 'SELECT * FROM Tabla_ID where OP = '+str(OP)
         DETECTOR_cursor.execute(DETECTOR_query)
@@ -104,18 +98,12 @@ def leer_Tabla_ID(OP):
     except:
         print("F_DETECTOR_CURSOR")
     finally:
-        connection.close() # Cerrar la conexión
         return DATA_ID[0]
 
 def leer_filas_OP(OP):
     filas_OP = 0
-    try: 
-        connection_string = f'DRIVER={{SQL Server}};SERVER={SERVER};DATABASE={DATABASE};UID={USERNAME};PWD={PASSWORD}'
-        connection = pyodbc.connect(connection_string)
-    except:
-        print("F_COMUNICACION_SQL")
     try:
-        DETECTOR_cursor = connection.cursor()
+        DETECTOR_cursor = conn.cursor()
         DETECTOR_cursor.execute("SELECT @@version;")
         DETECTOR_query = 'SELECT * FROM PT_V2 where OP = '+str(OP)
         DETECTOR_cursor.execute(DETECTOR_query)
@@ -124,7 +112,7 @@ def leer_filas_OP(OP):
     except:
         print("F_DETECTOR_CURSOR")
     finally:
-        connection.close() # Cerrar la conexión
+        conn.close() # Cerrar la conexión
         return filas_OP
     
 #-NOTION UPDATE---------------------------------------------
@@ -202,7 +190,7 @@ while True:
                     #-----------------------------------
                     ID_DB3 = leer_Tabla_ID(OP)
                     actualizar_datos_database(ID_DB3,ITEM)
-                
+                                
     except KeyboardInterrupt:
         print("Programa interrumpido por el usuario")
         break
