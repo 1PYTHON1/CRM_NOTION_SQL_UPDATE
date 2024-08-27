@@ -435,7 +435,11 @@ class DataEntryWidget(QWidget):
         try:
             DETECTOR_cursor = connection.cursor()
             DETECTOR_cursor.execute("SELECT @@version;")
+<<<<<<< HEAD
             DETECTOR_query = 'SELECT * FROM PEDIDOS TEMPLADOS where OP = '+ OP
+=======
+            DETECTOR_query = 'SELECT * FROM PT_V2 where OP = '+ OP
+>>>>>>> parent of 9918dc0 (CON DATOS SQL SERVER)
             DETECTOR_cursor.execute(DETECTOR_query)
             DETECTOR_FILAS = DETECTOR_cursor.fetchall()
             filas_OP = len(DETECTOR_FILAS)
