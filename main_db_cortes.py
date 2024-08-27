@@ -17,7 +17,7 @@ NOTION_TOKEN = "secret_DJgeLF4gqSFAci7vmdSje18Wjrh4iOKebK3WlUekpmv"
 new_state = True
 
 # Configuracion del Puerto Salida de Templado
-puerto_2 = 'COM6'
+puerto_2 = 'COM4'
 baudios = 9600
     
 # Deshabilitar la validación del certificado SSL temporalmente
