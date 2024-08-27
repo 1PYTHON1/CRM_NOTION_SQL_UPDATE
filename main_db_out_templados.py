@@ -112,7 +112,6 @@ def leer_filas_OP(OP):
     except:
         print("F_DETECTOR_CURSOR")
     finally:
-        conn.close() # Cerrar la conexión
         return filas_OP
     
 #-NOTION UPDATE---------------------------------------------
