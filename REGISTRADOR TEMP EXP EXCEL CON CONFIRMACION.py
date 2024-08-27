@@ -22,12 +22,12 @@ class DataEntryWidget(QWidget):
     def __init__(self):
         super().__init__()
         # Datos de Servidor SQL
-        self.NOTION_TOKEN = "secret_QsHgUe4EMkRVgfDrd4CvhvFdwcImB0GnaUD8htBAYjw"
+        self.NOTION_TOKEN = "secret_DJgeLF4gqSFAci7vmdSje18Wjrh4iOKebK3WlUekpmv"
         self.SERVER = '192.168.193.204'
         self.DATABASE = 'OPTemplados'
         self.USERNAME = 'sa'
         self.PASSWORD = 'admin9233'
-        self.ID_DB1 = "9742942ce3be45a7bfe38ddfb45a162f" # ID de la base de datos "LISTA DE PEDIDOS"
+        self.ID_DB1 = "0990935b88234136a3bf3de436d5943b" # ID de la base de datos "LISTA DE PEDIDOS"
         self.DATA_ITEM = []
         self.DATA_BASE = []
         self.DATA_ALTURA = []
@@ -308,7 +308,7 @@ class DataEntryWidget(QWidget):
             
                 try:
                     # Verificar si la OP ya existe en la tabla CLIENTES
-                    self.cursor.execute("SELECT COUNT(*) FROM CLIENTES WHERE OP = ?", (op,))
+                    self.cursor.execute("SELECT COUNT(*) FROM CLIENTES_TEMPLADOS WHERE OP = ?", (op,))
                     op_count = self.cursor.fetchone()[0]
             
                     if op_count > 0:
@@ -316,7 +316,7 @@ class DataEntryWidget(QWidget):
                         return
             
                     # Insertar los datos del cliente en la tabla CLIENTES
-                    self.cursor.execute("INSERT INTO CLIENTES VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'agregado')",
+                    self.cursor.execute("INSERT INTO CLIENTES_TEMPLADOS VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'agregado')",
                                         (op, cliente, vidrio, espesor, fecha, fecha_entrega, total, enjabado))
                     self.conn.commit()
             
@@ -435,11 +435,8 @@ class DataEntryWidget(QWidget):
         try:
             DETECTOR_cursor = connection.cursor()
             DETECTOR_cursor.execute("SELECT @@version;")
-<<<<<<< HEAD
             DETECTOR_query = 'SELECT * FROM PEDIDOS TEMPLADOS where OP = '+ OP
-=======
             DETECTOR_query = 'SELECT * FROM PT_V2 where OP = '+ OP
->>>>>>> parent of 9918dc0 (CON DATOS SQL SERVER)
             DETECTOR_cursor.execute(DETECTOR_query)
             DETECTOR_FILAS = DETECTOR_cursor.fetchall()
             filas_OP = len(DETECTOR_FILAS)
@@ -453,8 +450,8 @@ class DataEntryWidget(QWidget):
                     self.DATA_LAMINADO.append(DETECTOR_FILAS[i][5])
                     self.DATA_PINTADO.append(DETECTOR_FILAS[i][6])
                     self.DATA_INSULADO.append(DETECTOR_FILAS[i][7])
-                    self.DATA_CORTE.append(DETECTOR_FILAS[i][8])
-                    self.DATA_TEMPLADO.append(DETECTOR_FILAS[i][9])
+                    #self.DATA_CORTE.append(DETECTOR_FILAS[i][8])
+                    #self.DATA_TEMPLADO.append(DETECTOR_FILAS[i][9])
             else:
                 print("DATA SQL NO EXISTENTE PARA OP =",OP)
         except:
@@ -572,13 +569,16 @@ class DataEntryWidget(QWidget):
                                     "5_LAMINADO":{"checkbox":self.False_o_True(self.DATA_LAMINADO[i])},
                                     "6_PINTADO":{"checkbox":self.False_o_True(self.DATA_PINTADO[i])},
                                     "7_INSULADO":{"checkbox":self.False_o_True(self.DATA_INSULADO[i])},
-                                    "8_CORTE":{"checkbox":self.False_o_True(self.DATA_CORTE[i])},
-                                    "9_TEMPLADO":{"checkbox":self.False_o_True(self.DATA_TEMPLADO[i])}
+                                    #"8_CORTE":{"checkbox":self.False_o_True(self.DATA_CORTE[i])},
+                                    #"9_TEMPLADO":{"checkbox":self.False_o_True(self.DATA_TEMPLADO[i])}
                             }
                         }
                 requests.post(create_url, headers=headers, json=payload)
-        except:
-            print("F_LLENAR_DB3")
+            print("Se agrego correctamente los datos a Notion")
+            QMessageBox.information(self, 'Éxito', 'Se envio la informacion a Notion Correctamente.')
+        except Exception as e:
+            print("Falta_LLENAR_DB3")
+            QMessageBox.warning(self, "Error", f"Error al exportar datos a Notion: {e}")
 
     def False_o_True(self,x):
         if(x == "Sí"):
