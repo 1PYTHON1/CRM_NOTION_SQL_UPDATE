@@ -12,7 +12,6 @@ SERVER = '192.168.193.204'
 DATABASE = 'OPTemplados'
 USERNAME = 'sa'
 PASSWORD = 'admin9233'
-
 # Notion configuration
 NOTION_TOKEN = "secret_DJgeLF4gqSFAci7vmdSje18Wjrh4iOKebK3WlUekpmv"
 new_state = True
