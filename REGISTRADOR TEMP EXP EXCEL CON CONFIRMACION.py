@@ -22,7 +22,7 @@ class DataEntryWidget(QWidget):
     def __init__(self):
         super().__init__()
         # Datos de Servidor SQL
-        self.NOTION_TOKEN = "secret_DJgeLF4gqSFAci7vmdSje18Wjrh4iOKebK3WlUekpmv"
+        self.NOTION_TOKEN = "secret_QsHgUe4EMkRVgfDrd4CvhvFdwcImB0GnaUD8htBAYjw"
         self.SERVER = '192.168.193.204'
         self.DATABASE = 'OPTemplados'
         self.USERNAME = 'sa'
