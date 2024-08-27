@@ -329,7 +329,7 @@ class DataEntryWidget(QWidget):
                         values = item_text.split(',')
                         op = values[0].split(':')[1].strip()
                         item_num = values[1].split(':')[1].strip()
-                        self.cursor.execute("SELECT COUNT(*) FROM PEDIDOS WHERE OP = ? AND ITEM = ?", (op, item_num))
+                        self.cursor.execute("SELECT COUNT(*) FROM PEDIDOS_TEMPLADOS WHERE OP = ? AND ITEM = ?", (op, item_num))
                         duplicate_count = self.cursor.fetchone()[0]
                         if duplicate_count > 0:
                             QMessageBox.warning(self, 'Error', 'Ya existe una entrada con la misma OP y el mismo item en la tabla PEDIDOS.')
@@ -350,7 +350,7 @@ class DataEntryWidget(QWidget):
                         comentario = values[8].split(':')[1].strip()
             
                         # Insertar los valores en la tabla de PEDIDOS
-                        self.cursor.execute("INSERT INTO PEDIDOS (OP, ITEM, BASE, ALTURA, ENTALLE, LAMINADO, PINTADO, INSULADO, COMENTARIO) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        self.cursor.execute("INSERT INTO PEDIDOS_TEMPLADOS (OP, ITEM, BASE, ALTURA, ENTALLE, LAMINADO, PINTADO, INSULADO, COMENTARIO) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
                                             (op, item_num, base, altura, entalle, laminado, pintado, insulado, comentario))
                         self.conn.commit()
             
@@ -435,8 +435,7 @@ class DataEntryWidget(QWidget):
         try:
             DETECTOR_cursor = connection.cursor()
             DETECTOR_cursor.execute("SELECT @@version;")
-            DETECTOR_query = 'SELECT * FROM PEDIDOS TEMPLADOS where OP = '+ OP
-            DETECTOR_query = 'SELECT * FROM PT_V2 where OP = '+ OP
+            DETECTOR_query = 'SELECT * FROM PEDIDOS_TEMPLADOS where OP = '+ OP
             DETECTOR_cursor.execute(DETECTOR_query)
             DETECTOR_FILAS = DETECTOR_cursor.fetchall()
             filas_OP = len(DETECTOR_FILAS)
